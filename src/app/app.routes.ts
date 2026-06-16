@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
   {
@@ -10,30 +11,22 @@ export const routes: Routes = [
   {
     path: 'welcome',
     loadComponent: () =>
-      import('./features/welcome/welcome.component').then(
-        (m) => m.WelcomeComponent,
-      ),
+      import('./features/welcome/welcome.component').then((m) => m.WelcomeComponent),
   },
   {
     path: 'auth',
-    loadComponent: () =>
-      import('./layout/auth-layout/auth-layout.component').then(
-        (m) => m.AuthLayoutComponent,
-      ),
+    canActivate: [guestGuard],
+    canActivateChild: [guestGuard],
     children: [
       {
         path: 'login',
         loadComponent: () =>
-          import('./features/auth/login/login.component').then(
-            (m) => m.LoginComponent,
-          ),
+          import('./features/auth/login/login.component').then((m) => m.LoginComponent),
       },
       {
         path: 'register',
         loadComponent: () =>
-          import('./features/auth/register/register.component').then(
-            (m) => m.RegisterComponent,
-          ),
+          import('./features/auth/register/register.component').then((m) => m.RegisterComponent),
       },
       {
         path: '',
@@ -46,9 +39,7 @@ export const routes: Routes = [
     path: 'bible',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./layout/main-layout/main-layout.component').then(
-        (m) => m.MainLayoutComponent,
-      ),
+      import('./layout/main-layout/main-layout.component').then((m) => m.MainLayoutComponent),
     children: [
       {
         path: '',

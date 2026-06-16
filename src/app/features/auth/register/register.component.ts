@@ -25,6 +25,16 @@ export class RegisterComponent {
   error = '';
   showErrorModal = false;
   modalErrors: string[] = [];
+  showPassword = false;
+  showConfirmPassword = false;
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPassword(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
 
   submit(): void {
     if (this.form.invalid) {
@@ -45,7 +55,7 @@ export class RegisterComponent {
     this.error = '';
 
     this.authService.register({ name: name!, email: email!, password: password! }).subscribe({
-      next: () => this.router.navigate(['/auth/login']),
+      next: () => this.router.navigate(['/bible']),
       error: () => {
         this.error = 'Não foi possível criar a conta. Tente novamente.';
         this.loading = false;

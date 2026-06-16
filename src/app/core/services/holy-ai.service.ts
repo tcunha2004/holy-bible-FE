@@ -6,7 +6,7 @@ import {
   AiMessage,
   AiSession,
   ExplainRequest,
-  ExplainVerseRequest,
+  ExplainResponse,
 } from '../../shared/models/holy-ai.models';
 
 @Injectable({ providedIn: 'root' })
@@ -30,11 +30,7 @@ export class HolyAiService {
     return this.http.get<AiMessage[]>(`${this.apiUrl}/sessions/${sessionId}/messages`);
   }
 
-  explain(sessionId: string, body: ExplainRequest): Observable<AiMessage> {
-    return this.http.post<AiMessage>(`${this.apiUrl}/sessions/${sessionId}/explain`, body);
-  }
-
-  explainVerse(sessionId: string, body: ExplainVerseRequest): Observable<AiMessage> {
-    return this.http.post<AiMessage>(`${this.apiUrl}/sessions/${sessionId}/explain-verse`, body);
+  explain(sessionId: string, body: ExplainRequest): Observable<ExplainResponse> {
+    return this.http.post<ExplainResponse>(`${this.apiUrl}/sessions/${sessionId}/explain`, body);
   }
 }

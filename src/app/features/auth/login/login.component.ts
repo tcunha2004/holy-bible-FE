@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -19,28 +20,38 @@ export class LoginComponent {
     password: ['', Validators.required],
   });
 
-  loading = false;
-  error = '';
-  showErrorModal = false;
-  modalErrors: string[] = [];
+  loading = signal(false);
+  error = signal('');
+  showErrorModal = signal(false);
+  modalErrors = signal<string[]>([]);
+  showPassword = signal(false);
+
+  togglePassword(): void {
+    this.showPassword.update((v) => !v);
+  }
 
   submit(): void {
     if (this.form.invalid) {
-      this.modalErrors = this.collectErrors();
-      this.showErrorModal = true;
+      this.modalErrors.set(this.collectErrors());
+      this.showErrorModal.set(true);
       return;
     }
 
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
+    this.showErrorModal.set(false);
 
     const { email, password } = this.form.getRawValue();
 
     this.authService.login({ email: email!, password: password! }).subscribe({
       next: () => this.router.navigate(['/bible']),
-      error: () => {
-        this.error = 'Email ou senha incorretos.';
-        this.loading = false;
+      error: (err: HttpErrorResponse) => {
+        this.error.set(
+          err.status === 401
+            ? 'Email ou senha incorretos.'
+            : 'Ocorreu um erro inesperado. Tente novamente.',
+        );
+        this.loading.set(false);
       },
     });
   }
