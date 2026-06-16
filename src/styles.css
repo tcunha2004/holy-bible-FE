@@ -5,6 +5,7 @@
   --color-primary-dark: #4a86be;
   --color-gold: #c9a84c;
   --color-gold-light: #e8c96e;
+  --color-highlight-verse: #5b9bd566;
 }
 
 @layer base {
@@ -47,5 +48,13 @@
 
   .animate-fade-in-up {
     animation: fade-in-up 0.5s ease-out both;
+  }
+
+  .verse-highlight {
+    background-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
+    border-radius: 0.25rem;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 30%, transparent);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 }

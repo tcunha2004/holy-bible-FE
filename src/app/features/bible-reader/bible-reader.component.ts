@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  computed,
-  inject,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { Component, OnInit, computed, inject, signal, viewChild } from '@angular/core';
 import { BibleService } from '../../core/services/bible.service';
 import { AuthService } from '../../core/services/auth.service';
 import { AiSidebarComponent } from '../holy-ai/components/ai-sidebar/ai-sidebar.component';
@@ -28,6 +21,7 @@ export class BibleReaderComponent implements OnInit {
   showSidebar = signal(false);
 
   selectedVerseNumbers = signal<number[]>([]);
+  highlightedVerseNumbers = signal<number[]>([]);
   copied = signal(false);
 
   private readonly sidebar = viewChild(AiSidebarComponent);
@@ -38,6 +32,14 @@ export class BibleReaderComponent implements OnInit {
 
   selectedSet = computed(() => new Set(this.selectedVerseNumbers()));
 
+  highlightedSet = computed(() => new Set(this.highlightedVerseNumbers()));
+
+  allSelectedHighlighted = computed(() => {
+    const highlighted = this.highlightedSet();
+    const selected = this.selectedVerseNumbers();
+    return selected.length > 0 && selected.every((n) => highlighted.has(n));
+  });
+
   selectedVerses = computed(() => {
     const set = this.selectedSet();
     return (this.chapter()?.verses ?? []).filter((v) => set.has(v.number));
@@ -47,7 +49,7 @@ export class BibleReaderComponent implements OnInit {
     const chapter = this.chapter();
     const numbers = [...this.selectedVerseNumbers()].sort((a, b) => a - b);
     if (!chapter || !numbers.length) return '';
-    return `${chapter.book.name} ${chapter.number}:${this.compressRanges(numbers)}`;
+    return `${chapter.book.abbrev} ${chapter.number}:${this.compressRanges(numbers)}`;
   });
 
   chapterNumbers = computed(() => {
@@ -140,6 +142,31 @@ export class BibleReaderComponent implements OnInit {
     });
   }
 
+  toggleHighlight(): void {
+    const chapter = this.chapter();
+    const verseNumbers = this.selectedVerseNumbers();
+    if (!chapter || !verseNumbers.length) return;
+
+    const remove = this.allSelectedHighlighted();
+    const payload = {
+      abbrev: chapter.book.abbrev,
+      chapterNumber: chapter.number,
+      verseNumbers,
+    };
+    const request = remove
+      ? this.bibleService.unhighlightVerses(payload)
+      : this.bibleService.highlightVerses(payload);
+
+    request.subscribe(() => {
+      this.highlightedVerseNumbers.update((list) =>
+        remove
+          ? list.filter((n) => !verseNumbers.includes(n))
+          : [...new Set([...list, ...verseNumbers])],
+      );
+      this.clearSelection();
+    });
+  }
+
   askHoly(): void {
     const chapter = this.chapter();
     const selected = this.selectedVerses();
@@ -177,6 +204,9 @@ export class BibleReaderComponent implements OnInit {
     this.bibleService.getChapter(book.abbrev, this.selectedChapterNumber()).subscribe({
       next: (chapter) => {
         this.chapter.set(chapter);
+        this.highlightedVerseNumbers.set(
+          chapter.verses.filter((v) => v.highlighted).map((v) => v.number),
+        );
         this.loading.set(false);
       },
       error: () => this.loading.set(false),

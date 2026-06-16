@@ -111,9 +111,10 @@
           @for (verse of c.verses; track verse.number) {
             <span
               (click)="toggleVerse(verse.number)"
-              class="cursor-pointer underline-offset-[6px] decoration-1 decoration-primary/50 transition-colors"
+              class="cursor-pointer underline-offset-[6px] decoration-1 decoration-primary/50 transition-colors mr-1.5"
               [class.underline]="selectedSet().has(verse.number)"
               [class.text-primary]="selectedSet().has(verse.number)"
+              [class.verse-highlight]="highlightedSet().has(verse.number)"
               ><sup class="text-[10px] text-primary font-semibold mr-0.5 select-none">{{
                 verse.number
               }}</sup
@@ -172,7 +173,7 @@
 
   @if (selectedVerseNumbers().length) {
     <div
-      class="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] max-w-md px-3"
+      class="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-1rem)] max-w-md px-3"
     >
       <div
         class="bg-white rounded-2xl shadow-xl border border-gray-100 px-2 py-2 flex items-center gap-1"
@@ -180,6 +181,21 @@
         <span class="flex-1 min-w-0 truncate px-2 text-sm font-semibold text-[#1d1d1f]">
           {{ selectionReference() }}
         </span>
+
+        <button
+          (click)="toggleHighlight()"
+          [title]="allSelectedHighlighted() ? 'Remover grifo' : 'Grifar'"
+          class="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+        >
+          <svg
+            class="w-6 h-6 text-highlight-verse"
+            viewBox="0 0 24 24"
+            [attr.fill]="allSelectedHighlighted() ? 'none' : 'currentColor'"
+            stroke="currentColor"
+          >
+            <circle cx="12" cy="12" r="8" stroke-width="1.8" />
+          </svg>
+        </button>
 
         <button
           (click)="copySelection()"
@@ -219,7 +235,7 @@
         <button
           (click)="clearSelection()"
           title="Limpar seleção"
-          class="shrink-0 w-8 h-8 flex items-center justify-center rounded-xl text-gray-300 hover:text-[#1d1d1f] hover:bg-gray-50 transition-colors cursor-pointer"
+          class="shrink-0 w-8 h-8 flex items-center justify-center rounded-xl text-gray-400 hover:text-[#1d1d1f] hover:bg-gray-50 transition-colors cursor-pointer"
         >
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
