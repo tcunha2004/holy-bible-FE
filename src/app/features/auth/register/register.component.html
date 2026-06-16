@@ -51,17 +51,17 @@
         <div class="relative">
           <input
             formControlName="password"
-            [type]="showPassword ? 'text' : 'password'"
+            [type]="showPassword() ? 'text' : 'password'"
             placeholder="••••••••"
             class="w-full border border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm text-[#1d1d1f] placeholder:text-gray-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
           />
           <button
             type="button"
             (click)="togglePassword()"
-            [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+            [attr.aria-label]="showPassword() ? 'Ocultar senha' : 'Mostrar senha'"
             class="absolute inset-y-0 right-0 flex items-center px-3.5 text-gray-400 hover:text-[#1d1d1f] transition-colors cursor-pointer"
           >
-            @if (showPassword) {
+            @if (showPassword()) {
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   stroke-linecap="round"
@@ -95,17 +95,17 @@
         <div class="relative">
           <input
             formControlName="confirmPassword"
-            [type]="showConfirmPassword ? 'text' : 'password'"
+            [type]="showConfirmPassword() ? 'text' : 'password'"
             placeholder="••••••••"
             class="w-full border border-gray-200 rounded-xl px-4 py-3 pr-11 text-sm text-[#1d1d1f] placeholder:text-gray-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
           />
           <button
             type="button"
             (click)="toggleConfirmPassword()"
-            [attr.aria-label]="showConfirmPassword ? 'Ocultar senha' : 'Mostrar senha'"
+            [attr.aria-label]="showConfirmPassword() ? 'Ocultar senha' : 'Mostrar senha'"
             class="absolute inset-y-0 right-0 flex items-center px-3.5 text-gray-400 hover:text-[#1d1d1f] transition-colors cursor-pointer"
           >
-            @if (showConfirmPassword) {
+            @if (showConfirmPassword()) {
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   stroke-linecap="round"
@@ -134,28 +134,28 @@
         </div>
       </div>
 
-      @if (showErrorModal) {
+      @if (showErrorModal()) {
         <div
           class="bg-red-50 border border-red-100 rounded-xl px-4 py-3 flex items-start justify-between gap-3"
         >
           <ul class="flex flex-col gap-1.5">
-            @for (err of modalErrors; track err) {
+            @for (err of modalErrors(); track err) {
               <li class="text-xs text-red-500">{{ err }}</li>
             }
           </ul>
         </div>
       }
 
-      @if (error) {
-        <p class="text-xs text-red-400 text-center">{{ error }}</p>
+      @if (error()) {
+        <p class="text-xs text-red-400 text-center">{{ error() }}</p>
       }
 
       <button
         type="submit"
-        [disabled]="loading"
+        [disabled]="loading()"
         class="w-full bg-primary text-white cursor-pointer py-3.5 rounded-xl text-sm font-semibold hover:bg-primary-dark transition-colors mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {{ loading ? 'Criando conta...' : 'Criar conta' }}
+        {{ loading() ? 'Criando conta...' : 'Criar conta' }}
       </button>
     </form>
 

@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -21,46 +22,63 @@ export class RegisterComponent {
     confirmPassword: ['', Validators.required],
   });
 
-  loading = false;
-  error = '';
-  showErrorModal = false;
-  modalErrors: string[] = [];
-  showPassword = false;
-  showConfirmPassword = false;
+  loading = signal(false);
+  error = signal('');
+  showErrorModal = signal(false);
+  modalErrors = signal<string[]>([]);
+  showPassword = signal(false);
+  showConfirmPassword = signal(false);
 
   togglePassword(): void {
-    this.showPassword = !this.showPassword;
+    this.showPassword.update((v) => !v);
   }
 
   toggleConfirmPassword(): void {
-    this.showConfirmPassword = !this.showConfirmPassword;
+    this.showConfirmPassword.update((v) => !v);
   }
 
   submit(): void {
     if (this.form.invalid) {
-      this.modalErrors = this.collectErrors();
-      this.showErrorModal = true;
+      this.modalErrors.set(this.collectErrors());
+      this.showErrorModal.set(true);
       return;
     }
 
     const { name, email, password, confirmPassword } = this.form.getRawValue();
 
     if (password !== confirmPassword) {
-      this.modalErrors = ['As senhas não coincidem.'];
-      this.showErrorModal = true;
+      this.modalErrors.set(['As senhas não coincidem.']);
+      this.showErrorModal.set(true);
       return;
     }
 
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
+    this.showErrorModal.set(false);
 
     this.authService.register({ name: name!, email: email!, password: password! }).subscribe({
       next: () => this.router.navigate(['/bible']),
-      error: () => {
-        this.error = 'Não foi possível criar a conta. Tente novamente.';
-        this.loading = false;
+      error: (err: HttpErrorResponse) => {
+        const messages = this.extractServerErrors(err);
+        this.modalErrors.set(messages);
+        this.showErrorModal.set(true);
+        this.loading.set(false);
       },
     });
+  }
+
+  private extractServerErrors(err: HttpErrorResponse): string[] {
+    const message = err.error?.message;
+
+    if (Array.isArray(message) && message.length) {
+      return message;
+    }
+
+    if (typeof message === 'string' && message) {
+      return [message];
+    }
+
+    return ['Não foi possível criar a conta. Tente novamente.'];
   }
 
   private collectErrors(): string[] {
