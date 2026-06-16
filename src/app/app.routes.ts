@@ -36,6 +36,12 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'onboarding',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/onboarding/onboarding.component').then((m) => m.OnboardingComponent),
+  },
+  {
     path: 'bible',
     canActivate: [authGuard],
     loadComponent: () =>
