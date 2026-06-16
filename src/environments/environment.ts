@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:3000',
+  production: true,
+  apiUrl: 'https://holy-bible-api-production-67ab.up.railway.app',
 };
