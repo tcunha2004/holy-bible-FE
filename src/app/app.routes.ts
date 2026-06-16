@@ -5,7 +5,7 @@ import { guestGuard } from './core/guards/guest.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'welcome',
+    redirectTo: 'bible',
     pathMatch: 'full',
   },
   {
@@ -58,6 +58,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'welcome',
+    redirectTo: 'bible',
   },
 ];
