@@ -40,7 +40,6 @@ export class AiSidebarComponent implements OnInit, OnDestroy {
   private readonly onViewportChange = () => this.syncViewport();
 
   constructor() {
-    // Re-sincroniza ao abrir/fechar o painel (o teclado pode já estar aberto).
     effect(() => {
       this.open();
       queueMicrotask(() => this.syncViewport());
@@ -238,7 +237,6 @@ export class AiSidebarComponent implements OnInit, OnDestroy {
   }
 
   onKeydown(event: KeyboardEvent): void {
-    // No mobile (sem teclado físico) o Enter quebra linha; envio só pelo botão.
     if (event.key === 'Enter' && !event.shiftKey && !this.isCoarsePointer()) {
       event.preventDefault();
       this.send();
@@ -257,7 +255,6 @@ export class AiSidebarComponent implements OnInit, OnDestroy {
     const vv = typeof window !== 'undefined' ? window.visualViewport : null;
     if (!el || !vv) return;
 
-    // Só no mobile o painel é fullscreen (fixed inset-0); no desktop é lateral.
     const isMobile = window.matchMedia('(max-width: 767px)').matches;
     if (!isMobile || !this.open()) {
       el.style.height = '';
@@ -265,7 +262,6 @@ export class AiSidebarComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Encaixa o painel exatamente no viewport visível, acima do teclado virtual.
     el.style.height = `${vv.height}px`;
     el.style.top = `${vv.offsetTop}px`;
   }

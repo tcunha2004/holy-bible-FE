@@ -57,7 +57,10 @@ export class RegisterComponent {
     this.showErrorModal.set(false);
 
     this.authService.register({ name: name!, email: email!, password: password! }).subscribe({
-      next: () => this.router.navigate(['/onboarding']),
+      next: () => {
+        this.authService.startOnboarding();
+        this.router.navigate(['/onboarding']);
+      },
       error: (err: HttpErrorResponse) => {
         const messages = this.extractServerErrors(err);
         this.modalErrors.set(messages);

@@ -1,5 +1,4 @@
 <div class="min-h-screen bg-white flex flex-col px-6 py-10">
-  <!-- Top bar: progress + skip -->
   <header class="w-full max-w-md mx-auto flex items-center gap-4">
     <div class="flex-1 h-1 rounded-full bg-gray-100 overflow-hidden">
       <div
@@ -17,10 +16,8 @@
     }
   </header>
 
-  <!-- Content -->
   <main class="flex-1 w-full max-w-md mx-auto flex flex-col justify-center">
     @if (step() === 0) {
-      <!-- Welcome -->
       <div class="text-center animate-fade-in-up">
         <span class="inline-block text-xs font-semibold tracking-[0.2em] text-gold uppercase mb-8">
           Bem-vindo ao Holy
@@ -49,7 +46,6 @@
         <p class="text-xs text-gray-300 mt-5">Leva menos de um minuto.</p>
       </div>
     } @else if (currentQuestion(); as question) {
-      <!-- Question (keyed by step so the fade-in re-triggers on each transition) -->
       @for (s of [step()]; track s) {
         <div class="animate-fade-in-up">
           <p class="text-xs font-semibold tracking-[0.15em] text-gold uppercase mb-4">
@@ -134,7 +130,6 @@
         </div>
       }
     } @else {
-      <!-- Closing -->
       <div class="text-center animate-fade-in-up">
         <div class="w-px h-12 bg-gold mx-auto mb-10 rounded-full"></div>
 

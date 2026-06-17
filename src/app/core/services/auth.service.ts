@@ -15,6 +15,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly tokenKey = 'holy_bible_token';
+  private readonly onboardingKey = 'holy_bible_onboarding';
   private readonly apiUrl = environment.apiUrl;
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
@@ -32,6 +33,18 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     this.router.navigate(['/auth/login']);
+  }
+
+  startOnboarding(): void {
+    sessionStorage.setItem(this.onboardingKey, '1');
+  }
+
+  canOnboard(): boolean {
+    return sessionStorage.getItem(this.onboardingKey) === '1';
+  }
+
+  finishOnboarding(): void {
+    sessionStorage.removeItem(this.onboardingKey);
   }
 
   getToken(): string | null {

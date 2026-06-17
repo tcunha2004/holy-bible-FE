@@ -59,7 +59,6 @@ export class OnboardingComponent {
     },
   ];
 
-  // step 0 = welcome, 1..N = questions, N+1 = closing
   readonly step = signal(0);
   readonly answers = signal<Record<string, string>>({});
 
@@ -102,6 +101,7 @@ export class OnboardingComponent {
   }
 
   finish(): void {
+    this.authService.finishOnboarding();
     this.router.navigate(['/bible']);
   }
 
