@@ -1,6 +1,9 @@
 import {
   Component,
   ElementRef,
+  OnDestroy,
+  OnInit,
+  effect,
   inject,
   model,
   signal,
@@ -22,16 +25,43 @@ interface ChatMessage {
   imports: [],
   templateUrl: './ai-sidebar.component.html',
 })
-export class AiSidebarComponent {
+export class AiSidebarComponent implements OnInit, OnDestroy {
   private readonly holyAi = inject(HolyAiService);
   private readonly sanitizer = inject(DomSanitizer);
 
   readonly open = model(false);
 
+  private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
   private readonly scrollArea =
     viewChild<ElementRef<HTMLElement>>('scrollArea');
   private readonly composer =
     viewChild<ElementRef<HTMLTextAreaElement>>('composer');
+
+  private readonly onViewportChange = () => this.syncViewport();
+
+  constructor() {
+    // Re-sincroniza ao abrir/fechar o painel (o teclado pode já estar aberto).
+    effect(() => {
+      this.open();
+      queueMicrotask(() => this.syncViewport());
+    });
+  }
+
+  ngOnInit(): void {
+    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+    if (vv) {
+      vv.addEventListener('resize', this.onViewportChange);
+      vv.addEventListener('scroll', this.onViewportChange);
+    }
+  }
+
+  ngOnDestroy(): void {
+    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+    if (vv) {
+      vv.removeEventListener('resize', this.onViewportChange);
+      vv.removeEventListener('scroll', this.onViewportChange);
+    }
+  }
 
   readonly sessions = signal<AiSession[]>([]);
   readonly activeSessionId = signal<string | null>(null);
@@ -208,10 +238,36 @@ export class AiSidebarComponent {
   }
 
   onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    // No mobile (sem teclado físico) o Enter quebra linha; envio só pelo botão.
+    if (event.key === 'Enter' && !event.shiftKey && !this.isCoarsePointer()) {
       event.preventDefault();
       this.send();
     }
+  }
+
+  private isCoarsePointer(): boolean {
+    return (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(pointer: coarse)').matches
+    );
+  }
+
+  private syncViewport(): void {
+    const el = this.panel()?.nativeElement;
+    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+    if (!el || !vv) return;
+
+    // Só no mobile o painel é fullscreen (fixed inset-0); no desktop é lateral.
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    if (!isMobile || !this.open()) {
+      el.style.height = '';
+      el.style.top = '';
+      return;
+    }
+
+    // Encaixa o painel exatamente no viewport visível, acima do teclado virtual.
+    el.style.height = `${vv.height}px`;
+    el.style.top = `${vv.offsetTop}px`;
   }
 
   format(content: string): SafeHtml {
