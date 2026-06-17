@@ -1,5 +1,8 @@
 <div class="min-h-dvh bg-white flex flex-col">
-  <header class="sticky top-0 z-10 bg-white/90 backdrop-blur-sm pt-6">
+  <header
+    class="sticky top-0 z-10 bg-white/90 backdrop-blur-sm pt-6"
+    [class.max-md:hidden]="showSidebar()"
+  >
     <div class="max-w-2xl mx-auto px-4 h-14 flex items-center justify-center gap-10">
       <div class="relative flex-1 min-w-0 max-w-45">
         <select
@@ -86,7 +89,7 @@
     </button>
   </div>
 
-  <main class="flex-1">
+  <main class="flex-1" [class.max-md:hidden]="showSidebar()">
     <div class="max-w-2xl mx-auto px-6 pt-8 pb-20 md:py-12">
       @if (loading()) {
         <div class="animate-pulse">
@@ -128,6 +131,7 @@
 
   <div
     class="flex md:hidden items-center justify-between px-6 py-4 border-t border-gray-100 bg-white sticky bottom-0 z-10"
+    [class.max-md:hidden]="showSidebar()"
   >
     <button
       (click)="prevChapter()"
@@ -166,6 +170,7 @@
     <button
       (click)="showSidebar.set(!showSidebar())"
       class="fixed bottom-20 md:bottom-6 right-6 w-14 h-14 bg-primary rounded-full shadow-lg hover:bg-primary-dark transition-all flex items-center justify-center z-30 cursor-pointer"
+      [class.max-md:hidden]="showSidebar()"
     >
       <img src="holy-favicon.png" class="w-7 h-7 object-contain" alt="Holy AI" />
     </button>
@@ -174,6 +179,7 @@
   @if (selectedVerseNumbers().length) {
     <div
       class="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-1rem)] max-w-md px-3"
+      [class.max-md:hidden]="showSidebar()"
     >
       <div
         class="bg-white rounded-2xl shadow-xl border border-gray-100 px-2 py-2 flex items-center gap-1"
