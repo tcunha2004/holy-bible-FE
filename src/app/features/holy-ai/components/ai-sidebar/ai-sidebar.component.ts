@@ -259,11 +259,14 @@ export class AiSidebarComponent implements OnInit, OnDestroy {
     if (!isMobile || !this.open()) {
       el.style.height = '';
       el.style.top = '';
+      el.style.bottom = '';
       return;
     }
 
+    el.style.bottom = 'auto';
     el.style.height = `${vv.height}px`;
     el.style.top = `${vv.offsetTop}px`;
+    this.scrollToBottom();
   }
 
   format(content: string): SafeHtml {
