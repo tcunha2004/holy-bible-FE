@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { GuideService } from '../../core/services/guide.service';
 
 interface OnboardingOption {
   value: string;
@@ -23,6 +24,7 @@ interface OnboardingQuestion {
 export class OnboardingComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly guide = inject(GuideService);
 
   readonly userName = this.firstName(this.authService.getUserName());
 
@@ -102,7 +104,7 @@ export class OnboardingComponent {
 
   finish(): void {
     this.authService.finishOnboarding();
-    this.router.navigate(['/bible']);
+    this.router.navigate(['/bible']).then(() => this.guide.show());
   }
 
   private firstName(name: string | null): string {

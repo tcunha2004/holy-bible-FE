@@ -1,14 +1,17 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { GuideService } from '../../core/services/guide.service';
+import { HowToUseModalComponent } from '../../shared/components/how-to-use-modal/how-to-use-modal.component';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, HowToUseModalComponent],
   templateUrl: './main-layout.component.html',
 })
 export class MainLayoutComponent {
   private readonly authService = inject(AuthService);
+  private readonly guide = inject(GuideService);
 
   menuOpen = signal(false);
   userName = this.authService.getUserName();
@@ -28,5 +31,10 @@ export class MainLayoutComponent {
   logout(): void {
     this.menuOpen.set(false);
     this.authService.logout();
+  }
+
+  openGuide(): void {
+    this.menuOpen.set(false);
+    this.guide.show();
   }
 }
