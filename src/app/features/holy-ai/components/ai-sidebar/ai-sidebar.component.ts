@@ -260,12 +260,19 @@ export class AiSidebarComponent implements OnInit, OnDestroy {
       el.style.height = '';
       el.style.top = '';
       el.style.bottom = '';
+      el.style.paddingBottom = '';
       return;
     }
 
+    const keyboardInset = Math.max(
+      0,
+      window.innerHeight - vv.offsetTop - vv.height,
+    );
+
     el.style.bottom = 'auto';
-    el.style.height = `${vv.height}px`;
     el.style.top = `${vv.offsetTop}px`;
+    el.style.height = `${window.innerHeight - vv.offsetTop}px`;
+    el.style.paddingBottom = `${keyboardInset}px`;
     this.scrollToBottom();
   }
 
