@@ -13,6 +13,11 @@ export interface CreateUserRequest {
   password: string;
 }
 
+export interface VerifyCodeRequest {
+  email: string;
+  code: string;
+}
+
 export interface User {
   id: string;
   name: string;

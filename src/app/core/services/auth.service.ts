@@ -1,13 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, switchMap, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   CreateUserRequest,
   LoginRequest,
   LoginResponse,
-  User,
+  VerifyCodeRequest,
 } from '../../shared/models/auth.models';
 
 @Injectable({ providedIn: 'root' })
@@ -16,6 +16,7 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly tokenKey = 'holy_bible_token';
   private readonly onboardingKey = 'holy_bible_onboarding';
+  private readonly pendingEmailKey = 'holy_bible_pending_email';
   private readonly apiUrl = environment.apiUrl;
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
@@ -24,10 +25,35 @@ export class AuthService {
       .pipe(tap(({ access_token }) => this.saveToken(access_token)));
   }
 
-  register(data: CreateUserRequest): Observable<LoginResponse> {
+  startRegistration(data: CreateUserRequest): Observable<void> {
     return this.http
-      .post<User>(`${this.apiUrl}/users/create`, data)
-      .pipe(switchMap(() => this.login({ email: data.email, password: data.password })));
+      .post<void>(`${this.apiUrl}/auth/register/start`, data)
+      .pipe(tap(() => this.setPendingEmail(data.email)));
+  }
+
+  verifyCode(data: VerifyCodeRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/register/verify`, data).pipe(
+      tap(({ access_token }) => {
+        this.saveToken(access_token);
+        this.clearPendingEmail();
+      }),
+    );
+  }
+
+  resendCode(email: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/auth/register/resend`, { email });
+  }
+
+  private setPendingEmail(email: string): void {
+    sessionStorage.setItem(this.pendingEmailKey, email);
+  }
+
+  getPendingEmail(): string | null {
+    return sessionStorage.getItem(this.pendingEmailKey);
+  }
+
+  private clearPendingEmail(): void {
+    sessionStorage.removeItem(this.pendingEmailKey);
   }
 
   logout(): void {

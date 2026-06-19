@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { onboardingGuard } from './core/guards/onboarding.guard';
+import { verifyGuard } from './core/guards/verify.guard';
 
 export const routes: Routes = [
   {
@@ -28,6 +29,12 @@ export const routes: Routes = [
         path: 'register',
         loadComponent: () =>
           import('./features/auth/register/register.component').then((m) => m.RegisterComponent),
+      },
+      {
+        path: 'verify',
+        canActivate: [verifyGuard],
+        loadComponent: () =>
+          import('./features/auth/verify/verify.component').then((m) => m.VerifyComponent),
       },
       {
         path: '',

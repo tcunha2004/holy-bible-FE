@@ -16,9 +16,17 @@ export class RegisterComponent {
   private readonly router = inject(Router);
 
   form = this.fb.group({
-    name: ['', Validators.required],
+    name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(80)]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(6),
+        Validators.maxLength(50),
+        Validators.pattern(/^(?=.*[A-Z])(?=.*[0-9]).+$/),
+      ],
+    ],
     confirmPassword: ['', Validators.required],
   });
 
@@ -56,10 +64,9 @@ export class RegisterComponent {
     this.error.set('');
     this.showErrorModal.set(false);
 
-    this.authService.register({ name: name!, email: email!, password: password! }).subscribe({
+    this.authService.startRegistration({ name: name!, email: email!, password: password! }).subscribe({
       next: () => {
-        this.authService.startOnboarding();
-        this.router.navigate(['/onboarding']);
+        this.router.navigate(['/auth/verify']);
       },
       error: (err: HttpErrorResponse) => {
         const messages = this.extractServerErrors(err);
@@ -89,10 +96,15 @@ export class RegisterComponent {
     const { name, email, password, confirmPassword } = this.form.controls;
 
     if (name.errors?.['required']) errors.push('Informe seu nome.');
+    else if (name.errors?.['minlength']) errors.push('O nome deve ter pelo menos 2 caracteres.');
+    else if (name.errors?.['maxlength']) errors.push('O nome deve ter no máximo 80 caracteres.');
     if (email.errors?.['required']) errors.push('Informe seu email.');
     else if (email.errors?.['email']) errors.push('Informe um email válido.');
     if (password.errors?.['required']) errors.push('Informe sua senha.');
     else if (password.errors?.['minlength']) errors.push('A senha deve ter pelo menos 6 caracteres.');
+    else if (password.errors?.['maxlength']) errors.push('A senha deve ter no máximo 50 caracteres.');
+    else if (password.errors?.['pattern'])
+      errors.push('A senha deve ter ao menos uma letra maiúscula e um número.');
     if (confirmPassword.errors?.['required']) errors.push('Confirme sua senha.');
 
     return errors;
