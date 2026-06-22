@@ -57,14 +57,43 @@ export class BibleReaderComponent implements OnInit {
     return Array.from({ length: count }, (_, i) => i + 1);
   });
 
+  private readonly READING_KEY = 'holy_bible_last_reading';
+
   ngOnInit(): void {
     this.bibleService.getBooks().subscribe((books) => {
       this.books.set(books);
-      if (books.length) {
+      if (!books.length) return;
+
+      const saved = this.loadReadingPosition();
+      const book = saved && books.find((b) => b.abbrev === saved.abbrev);
+
+      if (book && saved!.chapter >= 1 && saved!.chapter <= book.chaptersCount) {
+        this.selectedBookAbbrev.set(saved!.abbrev);
+        this.selectedChapterNumber.set(saved!.chapter);
+      } else {
         this.selectedBookAbbrev.set(books[0].abbrev);
-        this.loadChapter();
       }
+      this.loadChapter();
     });
+  }
+
+  private storageKey(): string {
+    const userId = this.authService.getUserId() ?? 'anon';
+    return `${this.READING_KEY}:${userId}`;
+  }
+
+  private saveReadingPosition(abbrev: string, chapter: number): void {
+    localStorage.setItem(this.storageKey(), JSON.stringify({ abbrev, chapter }));
+  }
+
+  private loadReadingPosition(): { abbrev: string; chapter: number } | null {
+    const raw = localStorage.getItem(this.storageKey());
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
   }
 
   onBookChange(abbrev: string): void {
@@ -207,6 +236,7 @@ export class BibleReaderComponent implements OnInit {
         this.highlightedVerseNumbers.set(
           chapter.verses.filter((v) => v.highlighted).map((v) => v.number),
         );
+        this.saveReadingPosition(chapter.book.abbrev, chapter.number);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),

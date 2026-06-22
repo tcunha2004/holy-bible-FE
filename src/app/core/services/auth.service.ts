@@ -93,6 +93,13 @@ export class AuthService {
     return token ? (this.decodeToken(token)?.name ?? null) : null;
   }
 
+  getUserId(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    const payload = this.decodeToken(token);
+    return payload?.sub ?? payload?.name ?? null;
+  }
+
   private isTokenExpired(token: string): boolean {
     const payload = this.decodeToken(token);
 
@@ -103,7 +110,7 @@ export class AuthService {
     return payload.exp * 1000 <= Date.now();
   }
 
-  private decodeToken(token: string): { exp?: number; name?: string } | null {
+  private decodeToken(token: string): { exp?: number; name?: string; sub?: string } | null {
     try {
       const payload = token.split('.')[1];
       const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
