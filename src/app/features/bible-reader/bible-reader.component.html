@@ -4,57 +4,25 @@
     [class.max-md:hidden]="showSidebar()"
   >
     <div class="max-w-2xl mx-auto px-4 h-14 flex items-center justify-center gap-10">
-      <div class="relative flex-1 min-w-0 max-w-45">
-        <select
-          (change)="onBookChange($any($event.target).value)"
-          class="w-full appearance-none bg-transparent border-0 border-b border-gray-300 pl-0 pr-6 py-1.5 text-sm text-[#1d1d1f] focus:outline-none focus:border-primary transition-all cursor-pointer truncate"
-        >
-          @for (book of books(); track book.abbrev) {
-            <option [value]="book.abbrev" [selected]="book.abbrev === selectedBookAbbrev()">
-              {{ book.name }}
-            </option>
-          }
-        </select>
-        <svg
-          class="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2.5"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </div>
+      <app-custom-select
+        class="flex-1 min-w-0 max-w-45"
+        [options]="bookOptions()"
+        [value]="selectedBookAbbrev()"
+        (valueChange)="onBookChange($event)"
+        [searchable]="true"
+        placeholder="Livro"
+        searchPlaceholder="Buscar livro..."
+        ariaLabel="Selecionar livro"
+      />
 
-      <div class="relative flex-1 min-w-0 max-w-35">
-        <select
-          (change)="onChapterChange($any($event.target).value)"
-          class="w-full appearance-none bg-transparent border-0 border-b border-gray-300 pl-0 pr-6 py-1.5 text-sm text-[#1d1d1f] focus:outline-none focus:border-primary transition-all cursor-pointer"
-        >
-          @for (num of chapterNumbers(); track num) {
-            <option [value]="num" [selected]="num === selectedChapterNumber()">
-              Capítulo {{ num }}
-            </option>
-          }
-        </select>
-        <svg
-          class="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2.5"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </div>
+      <app-custom-select
+        class="flex-1 min-w-0 max-w-35"
+        [options]="chapterOptions()"
+        [value]="selectedChapterNumber()"
+        (valueChange)="onChapterChange($event)"
+        placeholder="Capítulo"
+        ariaLabel="Selecionar capítulo"
+      />
     </div>
   </header>
 

@@ -2,11 +2,15 @@ import { Component, OnInit, computed, inject, signal, viewChild } from '@angular
 import { BibleService } from '../../core/services/bible.service';
 import { AuthService } from '../../core/services/auth.service';
 import { AiSidebarComponent } from '../holy-ai/components/ai-sidebar/ai-sidebar.component';
+import {
+  CustomSelectComponent,
+  SelectOption,
+} from '../../shared/components/custom-select/custom-select.component';
 import { Book, Chapter } from '../../shared/models/bible.models';
 
 @Component({
   selector: 'app-bible-reader',
-  imports: [AiSidebarComponent],
+  imports: [AiSidebarComponent, CustomSelectComponent],
   templateUrl: './bible-reader.component.html',
 })
 export class BibleReaderComponent implements OnInit {
@@ -57,6 +61,14 @@ export class BibleReaderComponent implements OnInit {
     return Array.from({ length: count }, (_, i) => i + 1);
   });
 
+  bookOptions = computed<SelectOption[]>(() =>
+    this.books().map((b) => ({ value: b.abbrev, label: b.name })),
+  );
+
+  chapterOptions = computed<SelectOption[]>(() =>
+    this.chapterNumbers().map((n) => ({ value: n, label: `Capítulo ${n}` })),
+  );
+
   private readonly READING_KEY = 'holy_bible_last_reading';
 
   ngOnInit(): void {
@@ -96,13 +108,13 @@ export class BibleReaderComponent implements OnInit {
     }
   }
 
-  onBookChange(abbrev: string): void {
-    this.selectedBookAbbrev.set(abbrev);
+  onBookChange(abbrev: string | number | null): void {
+    this.selectedBookAbbrev.set(String(abbrev));
     this.selectedChapterNumber.set(1);
     this.loadChapter();
   }
 
-  onChapterChange(num: string): void {
+  onChapterChange(num: string | number | null): void {
     this.selectedChapterNumber.set(Number(num));
     this.loadChapter();
   }

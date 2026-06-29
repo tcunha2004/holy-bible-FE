@@ -1,0 +1,95 @@
+<button
+  type="button"
+  (click)="toggle()"
+  [attr.aria-label]="ariaLabel() || null"
+  [attr.aria-expanded]="isOpen()"
+  aria-haspopup="listbox"
+  class="w-full flex items-center bg-transparent border-0 border-b py-1.5 pl-0 pr-6 text-sm text-left text-[#1d1d1f] focus:outline-none transition-colors cursor-pointer"
+  [class.border-gray-300]="!isOpen()"
+  [class.border-primary]="isOpen()"
+>
+  <span class="flex-1 min-w-0 truncate" [class.text-gray-400]="!selectedLabel()">
+    {{ selectedLabel() || placeholder() }}
+  </span>
+  <svg
+    class="absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none transition-transform duration-200"
+    [class.rotate-180]="isOpen()"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+  </svg>
+</button>
+
+@if (isOpen()) {
+  <div
+    (keydown)="onKeydown($event)"
+    class="absolute left-0 top-full mt-2 z-50 min-w-full w-52 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-xl shadow-gray-900/10 border border-gray-100 overflow-hidden animate-dropdown"
+  >
+    @if (searchable()) {
+      <div class="p-2 border-b border-gray-50">
+        <div class="relative">
+          <svg
+            class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 pointer-events-none"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.8"
+              d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"
+            />
+          </svg>
+          <input
+            #searchInput
+            type="text"
+            [value]="query()"
+            (input)="onSearch($any($event.target).value)"
+            [placeholder]="searchPlaceholder()"
+            class="w-full bg-gray-50 rounded-xl pl-8 pr-3 py-2 text-sm text-[#1d1d1f] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+          />
+        </div>
+      </div>
+    }
+
+    <ul class="max-h-64 overflow-y-auto py-1.5" role="listbox" [attr.aria-label]="ariaLabel() || null">
+      @for (option of filteredOptions(); track option.value; let i = $index) {
+        <li role="option" [attr.aria-selected]="option.value === value()">
+          <button
+            type="button"
+            (click)="select(option)"
+            (mouseenter)="activeIndex.set(i)"
+            [attr.data-active]="i === activeIndex()"
+            class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition-colors cursor-pointer"
+            [class.bg-gray-50]="i === activeIndex()"
+            [class.text-primary]="option.value === value()"
+            [class.font-semibold]="option.value === value()"
+            [class.text-gray-600]="option.value !== value()"
+          >
+            <span class="flex-1 min-w-0 truncate">{{ option.label }}</span>
+            @if (option.value === value()) {
+              <svg
+                class="w-4 h-4 shrink-0 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4.5 12.75l6 6 9-13.5"
+                />
+              </svg>
+            }
+          </button>
+        </li>
+      } @empty {
+        <li class="px-4 py-6 text-sm text-center text-gray-400">Nenhum resultado</li>
+      }
+    </ul>
+  </div>
+}
