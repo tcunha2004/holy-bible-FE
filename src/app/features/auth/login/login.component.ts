@@ -4,10 +4,11 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
+import { ServiceUnavailableModalComponent } from '../../../shared/components/service-unavailable-modal/service-unavailable-modal.component';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, ServiceUnavailableModalComponent],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
